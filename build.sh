@@ -53,6 +53,16 @@ curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
 apt-get update && apt-get install nodejs -y
 apt-get install build-essential -y
 
+## Install Ruby
+apt-get update && apt-get install libgdbm-dev libncurses5-dev automake libtool bison libffi-dev
+gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3
+curl -sSL https://get.rvm.io | bash -s stable
+source ~/.rvm/scripts/rvm
+rvm install 2.3.1
+rvm use 2.3.1 --default
+ruby -v
+gem install sass compass
+
 ## Install Composer
 echo "$Cyan \n Installing Composer $Color_Off"
 curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer
