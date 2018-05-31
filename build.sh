@@ -54,8 +54,16 @@ apt-get update && apt-get install nodejs -y
 apt-get install build-essential -y
 
 ## Install Composer
-echo "$Cyan \n Installing Composer $Color_Off"
-curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer
+composer -v > /dev/null 2>&1
+COMPOSER_IS_INSTALLED=$?
+
+# True, if composer is not installed
+if [ $COMPOSER_IS_INSTALLED -ne 0 ]; then
+    echo "$Cyan \n Installing Composer $Color_Off"
+    curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer
+else
+    echo "$Cyan \n Composer already installed $Color_Off"
+fi
 
 ## Add git branch to PS1
 echo "\n# Add Git branch to command line" >> ~/.bashrc
