@@ -47,17 +47,24 @@ a2enmod fastcgi
 echo "$Cyan \n Restarting Apache $Color_Off"
 service apache2 restart
 
-## Install NodeJS
-echo "$Cyan \n Installing Node.js $Color_Off"
-curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
-apt-get update && apt-get install nodejs -y
-apt-get install build-essential -y
+## Install NodeJS if node and nvm are not installed.
+if ! command -v node && command -v nvm ;
+then
+    echo "$Cyan \n Installing Node.js $Color_Off"
+    curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
+    source ~/.bashrc
+    nvm install v10.3.0
+    nvm use v10.3.0
+    npm install -g yarn
+else
+    echo "$Cyan \n Node or NVM is installed already $Color_Off"
+fi
 
-## Install Composer
+## Check Composer installation status
 composer -v > /dev/null 2>&1
 COMPOSER_IS_INSTALLED=$?
 
-# True, if composer is not installed
+## If true, composer is not installed
 if [ $COMPOSER_IS_INSTALLED -ne 0 ]; then
     echo "$Cyan \n Installing Composer $Color_Off"
     curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer
@@ -65,11 +72,16 @@ else
     echo "$Cyan \n Composer already installed $Color_Off"
 fi
 
-## Add git branch to PS1
-echo "\n# Add Git branch to command line" >> ~/.bashrc
-echo "parse_git_branch() {" >> ~/.bashrc
-echo "    git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'" >> ~/.bashrc
-echo "}" >> ~/.bashrc
+## Function to add current Git branch to prompt
+if ! grep -q "parse_git_branch" ~/.bashrc ; then
+    echo "\n# Add Git branch to command line" >> ~/.bashrc
+    echo "parse_git_branch() {" >> ~/.bashrc
+    echo "    git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'" >> ~/.bashrc
+    echo "}" >> ~/.bashrc
+fi
 
-PS1="\u@\h \[\033[32m\]\w\[\033[33m\]\$(parse_git_branch)\[\033[00m\] $ "
-echo "export PS1=$PS1" >> ~/.bashrc
+## Add colors and git branch function to prompt
+if ! grep -q "export PS1" ~/.bashrc ; then
+    PS1="\u@\h \[\033[32m\]\w\[\033[33m\]\$(parse_git_branch)\[\033[00m\] $ "
+    echo "export PS1=$PS1" >> ~/.bashrc
+fi
